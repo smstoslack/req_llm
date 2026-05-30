@@ -1,10 +1,12 @@
 {
+  "model_spec": "xai:grok-4-fast-reasoning",
+  "provider": "xai",
   "request": {
     "body": {
-      "b64": "eyJtYXhfY29tcGxldGlvbl90b2tlbnMiOjUwLCJtZXNzYWdlcyI6W3siY29udGVudCI6IkhlbGxvIHdvcmxkISIsInJvbGUiOiJ1c2VyIn1dLCJtb2RlbCI6Imdyb2stNC1mYXN0LXJlYXNvbmluZyIsInNlZWQiOjQyLCJzdHJlYW0iOmZhbHNlLCJ0ZW1wZXJhdHVyZSI6MC4wfQ=="
+      "b64": "eyJtYXhfY29tcGxldGlvbl90b2tlbnMiOjIwMDAsIm1lc3NhZ2VzIjpbeyJjb250ZW50IjoiSGVsbG8gd29ybGQhIiwicm9sZSI6InVzZXIifV0sIm1vZGVsIjoiZ3Jvay00LWZhc3QtcmVhc29uaW5nIiwicmVhc29uaW5nX2VmZm9ydCI6ImxvdyIsInNlZWQiOjQyLCJzdHJlYW0iOmZhbHNlLCJ0ZW1wZXJhdHVyZSI6MC4wfQ=="
     },
     "canonical_json": {
-      "max_completion_tokens": 50,
+      "max_completion_tokens": 2000,
       "messages": [
         {
           "content": "Hello world!",
@@ -12,11 +14,15 @@
         }
       ],
       "model": "grok-4-fast-reasoning",
+      "reasoning_effort": "low",
       "seed": 42,
       "stream": false,
       "temperature": 0.0
     },
     "headers": {
+      "accept": [
+        "application/json"
+      ],
       "accept-encoding": [
         "gzip"
       ],
@@ -25,7 +31,7 @@
         "application/json"
       ],
       "user-agent": [
-        "req/0.5.15"
+        "req/0.5.18"
       ]
     },
     "method": "post",
@@ -38,34 +44,36 @@
           "finish_reason": "stop",
           "index": 0,
           "message": {
-            "content": "Hello! What's on your mind today?",
+            "content": "Hello, World! 👋 What's up?",
+            "reasoning_content": "The user said \"Hello world!\" This is a classic greeting, often the first program in programming tutorials. It's friendly and casual.",
             "refusal": null,
             "role": "assistant"
           }
         }
       ],
-      "created": 1762103798,
-      "id": "53440e6a-af53-d19c-3419-3a66c0dd0f85_us-east-1",
-      "model": "grok-4-fast-reasoning",
+      "created": 1780103062,
+      "id": "c9f194e1-ca00-9d02-93cb-de4084faa68a",
+      "model": "grok-4.3",
       "object": "chat.completion",
-      "system_fingerprint": "fp_bfbe7bd0a2",
+      "system_fingerprint": "fp_eb3c003fc66c14ed",
       "usage": {
-        "completion_tokens": 8,
+        "completion_tokens": 9,
         "completion_tokens_details": {
           "accepted_prediction_tokens": 0,
           "audio_tokens": 0,
-          "reasoning_tokens": 123,
+          "reasoning_tokens": 138,
           "rejected_prediction_tokens": 0
         },
+        "cost_in_usd_ticks": 3993500,
         "num_sources_used": 0,
-        "prompt_tokens": 159,
+        "prompt_tokens": 133,
         "prompt_tokens_details": {
           "audio_tokens": 0,
-          "cached_tokens": 151,
+          "cached_tokens": 128,
           "image_tokens": 0,
-          "text_tokens": 159
+          "text_tokens": 133
         },
-        "total_tokens": 290
+        "total_tokens": 280
       }
     },
     "headers": {
@@ -79,7 +87,7 @@
         "DYNAMIC"
       ],
       "cf-ray": [
-        "998547e7789ceae2-ORD"
+        "a039d3077ab0dd56-ORD"
       ],
       "connection": [
         "keep-alive"
@@ -88,16 +96,17 @@
         "application/json"
       ],
       "date": [
-        "Sun, 02 Nov 2025 17:16:39 GMT"
+        "Sat, 30 May 2026 01:04:23 GMT"
       ],
       "server": [
         "cloudflare"
       ],
-      "set-cookie": [
-        "__cf_bm=NJ5OqpearLA7mY4gJnhqjgoKidpQUj0WcYCsNNUCRqA-1762103799-1.0.1.1-BRdl2NHqDhUNmoVZHqJLTLZptzzSjXhheaFtLPwEChddtEzqFWLw_AEEyO542cfRt2aYY_ln1qts_0N9Qgv2Fk8f6QkfHBtUBDSsQLMyReU; path=/; expires=Sun, 02-Nov-25 17:46:39 GMT; domain=.x.ai; HttpOnly; Secure; SameSite=None"
-      ],
+      "set-cookie": "[REDACTED:set-cookie]",
       "strict-transport-security": [
         "max-age=31536000"
+      ],
+      "traceparent": [
+        "00-16648960c0a47c4a6db017f4983194e5-2dbee7d60001df23-01"
       ],
       "transfer-encoding": [
         "chunked"
@@ -105,13 +114,35 @@
       "vary": [
         "origin, access-control-request-method, access-control-request-headers"
       ],
+      "x-metrics-e2e-ms": [
+        "1929.5"
+      ],
+      "x-metrics-mean-itl-ms": [
+        "11.1"
+      ],
+      "x-metrics-ttft-ms": [
+        "166.5"
+      ],
+      "x-ratelimit-limit-requests": [
+        "1800"
+      ],
+      "x-ratelimit-limit-tokens": [
+        "10000000"
+      ],
+      "x-ratelimit-remaining-requests": [
+        "1800"
+      ],
+      "x-ratelimit-remaining-tokens": [
+        "10000000"
+      ],
       "x-request-id": [
-        "00-b8807d8336934c2ea0ed5c7cf7df7e0a-5b06c125006dce77-01"
+        "c9f194e1-ca00-9d02-93cb-de4084faa68a"
       ],
       "x-zero-data-retention": [
         "false"
       ]
     },
     "status": 200
-  }
+  },
+  "streaming": false
 }

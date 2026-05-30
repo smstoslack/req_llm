@@ -1,0 +1,148 @@
+{
+  "model_spec": "xai:grok-4.3",
+  "provider": "xai",
+  "request": {
+    "body": {
+      "b64": "eyJtYXhfY29tcGxldGlvbl90b2tlbnMiOjIwMDAsIm1lc3NhZ2VzIjpbeyJjb250ZW50IjoiSGVsbG8gd29ybGQhIiwicm9sZSI6InVzZXIifV0sIm1vZGVsIjoiZ3Jvay00LjMiLCJyZWFzb25pbmdfZWZmb3J0IjoibG93Iiwic2VlZCI6NDIsInN0cmVhbSI6ZmFsc2UsInRlbXBlcmF0dXJlIjowLjB9"
+    },
+    "canonical_json": {
+      "max_completion_tokens": 2000,
+      "messages": [
+        {
+          "content": "Hello world!",
+          "role": "user"
+        }
+      ],
+      "model": "grok-4.3",
+      "reasoning_effort": "low",
+      "seed": 42,
+      "stream": false,
+      "temperature": 0.0
+    },
+    "headers": {
+      "accept": [
+        "application/json"
+      ],
+      "accept-encoding": [
+        "gzip"
+      ],
+      "authorization": "[REDACTED:authorization]",
+      "content-type": [
+        "application/json"
+      ],
+      "user-agent": [
+        "req/0.5.18"
+      ]
+    },
+    "method": "post",
+    "url": "https://api.x.ai/v1/chat/completions"
+  },
+  "response": {
+    "body": {
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "content": "Hello, World! 👋 What's up?",
+            "reasoning_content": "The user said \"Hello world!\" This is a classic greeting, often the first program in programming tutorials. It's friendly and casual.",
+            "refusal": null,
+            "role": "assistant"
+          }
+        }
+      ],
+      "created": 1780103100,
+      "id": "34a3fb56-71a5-914f-8b2c-304fb2bd20f3",
+      "model": "grok-4.3",
+      "object": "chat.completion",
+      "system_fingerprint": "fp_eb3c003fc66c14ed",
+      "usage": {
+        "completion_tokens": 9,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 181,
+          "rejected_prediction_tokens": 0
+        },
+        "cost_in_usd_ticks": 5068500,
+        "num_sources_used": 0,
+        "prompt_tokens": 133,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 128,
+          "image_tokens": 0,
+          "text_tokens": 133
+        },
+        "total_tokens": 323
+      }
+    },
+    "headers": {
+      "access-control-allow-origin": [
+        "*"
+      ],
+      "access-control-expose-headers": [
+        "*"
+      ],
+      "cf-cache-status": [
+        "DYNAMIC"
+      ],
+      "cf-ray": [
+        "a039d3f6796b344d-ORD"
+      ],
+      "connection": [
+        "keep-alive"
+      ],
+      "content-type": [
+        "application/json"
+      ],
+      "date": [
+        "Sat, 30 May 2026 01:05:02 GMT"
+      ],
+      "server": [
+        "cloudflare"
+      ],
+      "set-cookie": "[REDACTED:set-cookie]",
+      "strict-transport-security": [
+        "max-age=31536000"
+      ],
+      "traceparent": [
+        "00-124fcd9dd6344579d3ae650b9d24aa9d-94ad52410002141f-01"
+      ],
+      "transfer-encoding": [
+        "chunked"
+      ],
+      "vary": [
+        "origin, access-control-request-method, access-control-request-headers"
+      ],
+      "x-metrics-e2e-ms": [
+        "2826.2"
+      ],
+      "x-metrics-mean-itl-ms": [
+        "13.1"
+      ],
+      "x-metrics-ttft-ms": [
+        "181.2"
+      ],
+      "x-ratelimit-limit-requests": [
+        "1800"
+      ],
+      "x-ratelimit-limit-tokens": [
+        "10000000"
+      ],
+      "x-ratelimit-remaining-requests": [
+        "1800"
+      ],
+      "x-ratelimit-remaining-tokens": [
+        "10000000"
+      ],
+      "x-request-id": [
+        "34a3fb56-71a5-914f-8b2c-304fb2bd20f3"
+      ],
+      "x-zero-data-retention": [
+        "false"
+      ]
+    },
+    "status": 200
+  },
+  "streaming": false
+}

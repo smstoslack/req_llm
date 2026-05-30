@@ -1,0 +1,123 @@
+{
+  "model_spec": "google:gemini-3-flash-preview",
+  "provider": "google",
+  "request": {
+    "body": {
+      "b64": "eyJjb250ZW50cyI6W3sicGFydHMiOlt7InRleHQiOiJIZWxsbyB3b3JsZCEifV0sInJvbGUiOiJ1c2VyIn1dLCJnZW5lcmF0aW9uQ29uZmlnIjp7ImNhbmRpZGF0ZUNvdW50IjoxLCJtYXhPdXRwdXRUb2tlbnMiOjIwMDAsInRlbXBlcmF0dXJlIjowLjAsInRoaW5raW5nQ29uZmlnIjp7ImluY2x1ZGVUaG91Z2h0cyI6dHJ1ZSwidGhpbmtpbmdMZXZlbCI6ImxvdyJ9fX0="
+    },
+    "canonical_json": {
+      "contents": [
+        {
+          "parts": [
+            {
+              "text": "Hello world!"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "generationConfig": {
+        "candidateCount": 1,
+        "maxOutputTokens": 2000,
+        "temperature": 0.0,
+        "thinkingConfig": {
+          "includeThoughts": true,
+          "thinkingLevel": "low"
+        }
+      }
+    },
+    "headers": {
+      "accept": [
+        "application/json"
+      ],
+      "accept-encoding": [
+        "gzip"
+      ],
+      "content-type": [
+        "application/json"
+      ],
+      "user-agent": [
+        "req/0.5.18"
+      ]
+    },
+    "method": "post",
+    "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=[REDACTED]"
+  },
+  "response": {
+    "body": {
+      "candidates": [
+        {
+          "content": {
+            "parts": [
+              {
+                "text": "**My Initial Response to the User's Input**\n\nOkay, so the user started with \"Hello world!\". Ah, the ubiquitous \"Hello, World!\" It's practically etched into the DNA of programming introductions. Right, so the goal here is to be friendly, welcoming, and helpful. No surprises there. Now, let's consider the options for my response. Option 1, the simple greeting, is always a safe bet: \"Hello! How can I help you today?\". Very direct, to the point, and professional. Good for initial interactions. Then there's Option 2: a bit more playful, programmer-themed \"Hello! Ready to write some code?\". I quite like this; it establishes a connection and sets a collaborative tone. Might be appealing. Finally, there's the more informative Option 3: \"Hello! I am an AI assistant...\". This feels a little more formal, like an introduction of my purpose right away. I'll need to gauge the context before I make a final choice. I am leaning towards the playful one, it resonates with me.\n\n\n",
+                "thought": true
+              },
+              {
+                "text": "Hello! It's great to meet you. How can I help you today?",
+                "thoughtSignature": "ErIDCq8DAQw51scoiE6Um3VS2HxfwEuzaF2EhJRS+HdrYG5eVMHTk1ClubmT+ePfi3RIwQd+RIyVeMS5QMp40cocuW8ZfvPCRurawFymzeiLlWJSIhfF1uWVqPk2jKHFPnr39Ib8ZJqSudvxQ9hZ+YEC3CCCEhV0YhYuiZ7CVDesErFBwBdFMJlnqcTOi8pTd9RFarFjaIYYQZyLoOkbHASt4rj8tc9GLHOUKqLWdZ9QLfhqO2GhVGdtVHkb9dsJAtfkuPxFUgDDvrKv0EkIGElam4K1vqN6huCRCL0q9rwhmNz70Z6H2ibbDq5Y8GWiFsBBoUv/88wagC1U9nDwPiYkl1IND3QHRiTRTNAmF0aRSLKLJ4NuavhCjDkrCKFsSmON0tCVveC5iGVcX8ecexqa099b4DVHLHU/T87Z8UhEYWQtfswh5bEJRwZ27EhMYHGrVbG+CMx1bWTJ+nZH7x2hG2sHHRxPeAqTOEAQy51avxWROdMnK3l5/HUmggYagIzUleNrJGhu0kUGTh5ClrnIQ+tznlPTXmJX15OOif7c1vX7o/tPQAX5xCSYUPFcMBKxqWc="
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        }
+      ],
+      "modelVersion": "gemini-3-flash-preview",
+      "responseId": "SzYaasTnFe2Z-8YPqeOA-A4",
+      "usageMetadata": {
+        "candidatesTokenCount": 17,
+        "promptTokenCount": 4,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 4
+          }
+        ],
+        "serviceTier": "standard",
+        "thoughtsTokenCount": 96,
+        "totalTokenCount": 117
+      }
+    },
+    "headers": {
+      "alt-svc": [
+        "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+      ],
+      "content-type": [
+        "application/json; charset=UTF-8"
+      ],
+      "date": [
+        "Sat, 30 May 2026 00:58:53 GMT"
+      ],
+      "server": [
+        "scaffolding on HTTPServer2"
+      ],
+      "server-timing": [
+        "gfet4t7; dur=2365"
+      ],
+      "transfer-encoding": [
+        "chunked"
+      ],
+      "vary": [
+        "Origin",
+        "X-Origin",
+        "Referer"
+      ],
+      "x-content-type-options": [
+        "nosniff"
+      ],
+      "x-frame-options": [
+        "SAMEORIGIN"
+      ],
+      "x-gemini-service-tier": [
+        "standard"
+      ],
+      "x-xss-protection": [
+        "0"
+      ]
+    },
+    "status": 200
+  },
+  "streaming": false
+}

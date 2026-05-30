@@ -16,13 +16,14 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
   - **type**: Filters by operation capability using registry metadata
     - `text` (default): Only text-generation models
     - `embedding`: Only embedding models
-    - `all`: Both text and embedding models
-  - **sample** (optional): Further reduces using `:sample_text_models` or `:sample_embedding_models`.
+    - `image`, `speech`, `transcription`, `rerank`, `ocr`: Specialty operation models
+    - `all`: All implemented registry models
+  - **sample** (optional): Further reduces using `:sample_*_models` config.
     If not configured, falls back to one model per provider.
 
   **Important**:
   - Only **implemented providers** are included (registry models without implementation are skipped)
-  - Config lists (`:test_models`, `:test_embedding_models`) are defaults only, not hard filters
+  - Config lists (`:sample_*_models`) are defaults only, not hard filters
   - Explicit specs like `"anthropic:*"` test ALL registry models for that provider
 
   ## Usage
@@ -37,8 +38,10 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
       mix req_llm.model_compat "*:*"              # ALL models from implemented providers
 
       ### Test by operation type
-      mix req_llm.model_compat "google:*" --type all        # Google text + embedding models
+      mix req_llm.model_compat "google:*" --type all        # Google models across operations
       mix req_llm.model_compat "google:*" --type embedding  # Google embedding models only
+      mix req_llm.model_compat "openai:*" --type image      # OpenAI image models only
+      mix req_llm.model_compat "elevenlabs:*" --type speech # ElevenLabs TTS models only
       mix req_llm.model_compat "*:*" --type text            # All implemented text models
 
       ### Sample subset testing
@@ -53,9 +56,13 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
 
       --available        List all models from models.dev API registry (no implementation filter)
       --sample           Further reduce to sample subset (see :sample_* config or fallback)
-      --type TYPE        Operation type: text (default), embedding, or all
+      --type TYPE        Operation type: text, embedding, image, speech, transcription, rerank, ocr, or all
       --record           Re-record fixtures (live API calls)
       --record-all       Force re-record all fixtures (ignores state)
+      --update-state     Update generated compatibility state during replay checks
+      --scenario LIST    Comma-separated scenario tags to run (e.g. basic,usage)
+      --capability LIST  Comma-separated capability groups to run
+      --max-concurrency N
       --debug            Enable verbose fixture debugging
 
   ## Notes
@@ -68,6 +75,45 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
   use Mix.Task
 
   @preferred_cli_env :test
+  @capability_scenarios %{
+    "core" => ~w(basic usage token_limit),
+    "conversation" => ~w(context_append),
+    "streaming" => ~w(streaming),
+    "tools" => ~w(tool_none tool_multi tool_round_trip),
+    "objects" => ~w(object_basic object_streaming),
+    "reasoning" => ~w(reasoning),
+    "embedding" => ~w(embed_basic embed_usage embed_batch),
+    "image" => ~w(image_basic),
+    "speech" => ~w(speech_basic),
+    "transcription" => ~w(transcription_basic),
+    "rerank" => ~w(rerank_basic),
+    "ocr" => ~w(ocr_basic),
+    "grounding" => ~w(grounding_basic grounding_with_context grounding_streaming),
+    "grounding_legacy" => ~w(grounding_legacy),
+    "multimodal_tool_result" => ~w(multimodal_tool_result),
+    "web_search" => ~w(web_search_basic web_search_streaming x_search_streaming),
+    "streaming_structured_output" =>
+      ~w(object_streaming_json_schema object_streaming_tool_strict object_streaming_auto streaming_error_handling)
+  }
+
+  @scenario_test_files %{
+    google: %{
+      "grounding_basic" => "test/coverage/google/grounding_test.exs",
+      "grounding_with_context" => "test/coverage/google/grounding_test.exs",
+      "grounding_streaming" => "test/coverage/google/grounding_test.exs",
+      "grounding_legacy" => "test/coverage/google/grounding_test.exs",
+      "multimodal_tool_result" => "test/coverage/google/multimodal_tool_result_test.exs"
+    },
+    xai: %{
+      "web_search_basic" => "test/coverage/xai/web_search_test.exs",
+      "web_search_streaming" => "test/coverage/xai/web_search_test.exs",
+      "x_search_streaming" => "test/coverage/xai/web_search_test.exs",
+      "object_streaming_json_schema" => "test/coverage/xai/streaming_structured_output_test.exs",
+      "object_streaming_tool_strict" => "test/coverage/xai/streaming_structured_output_test.exs",
+      "object_streaming_auto" => "test/coverage/xai/streaming_structured_output_test.exs",
+      "streaming_error_handling" => "test/coverage/xai/streaming_structured_output_test.exs"
+    }
+  }
 
   @impl Mix.Task
   def run(args) do
@@ -82,6 +128,10 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
           type: :string,
           record: :boolean,
           record_all: :boolean,
+          update_state: :boolean,
+          scenario: :string,
+          capability: :string,
+          max_concurrency: :integer,
           debug: :boolean
         ]
       )
@@ -94,10 +144,45 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
     end
   end
 
+  @doc false
+  def scenarios_for_opts(opts, operation \\ :text) do
+    scenarios = csv_values(opts[:scenario])
+
+    capability_scenarios =
+      opts[:capability]
+      |> csv_values()
+      |> Enum.flat_map(&capability_scenarios!/1)
+
+    operation_capability = Atom.to_string(operation)
+
+    operation_defaults =
+      if opts[:capability] == operation_capability and
+           Map.has_key?(@capability_scenarios, operation_capability) do
+        Map.fetch!(@capability_scenarios, operation_capability)
+      else
+        []
+      end
+
+    (scenarios ++ capability_scenarios ++ operation_defaults)
+    |> Enum.uniq()
+  end
+
+  @doc false
+  def capability_scenarios!(capability) when is_binary(capability) do
+    case Map.fetch(@capability_scenarios, capability) do
+      {:ok, scenarios} -> scenarios
+      :error -> Mix.raise("Unknown capability group: #{capability}")
+    end
+  end
+
+  @doc false
+  def state_update?(opts), do: opts[:record_all] || opts[:record] || opts[:update_state]
+
   defp list_models(opts) do
     models = load_registry()
     state = load_state()
-    sample_specs = if opts[:sample], do: default_specs_for_operation(:text)
+    operation = parse_operation_type(opts[:type])
+    sample_specs = if opts[:sample], do: default_specs_for_operation(operation)
     implemented_providers = get_implemented_providers()
 
     Mix.shell().info("\n#{header(opts[:sample])}\n")
@@ -298,7 +383,7 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
         fn {provider, model_id} ->
           test_model(provider, model_id, opts)
         end,
-        max_concurrency: System.schedulers_online() * 2,
+        max_concurrency: max_concurrency(opts),
         timeout: :infinity,
         ordered: false
       )
@@ -306,8 +391,10 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
 
     elapsed = System.monotonic_time(:millisecond) - start_time
 
-    run_ts = DateTime.utc_now() |> DateTime.truncate(:second)
-    save_state(results, run_ts)
+    if state_update?(opts) do
+      run_ts = DateTime.utc_now() |> DateTime.truncate(:second)
+      save_state(results, run_ts, opts)
+    end
 
     print_enhanced_summary(model_spec, results, models, elapsed, opts)
   end
@@ -340,7 +427,7 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
         fn {provider, model_id} ->
           test_model(provider, model_id, opts)
         end,
-        max_concurrency: System.schedulers_online() * 2,
+        max_concurrency: max_concurrency(opts),
         timeout: :infinity,
         ordered: false
       )
@@ -348,28 +435,41 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
 
     elapsed = System.monotonic_time(:millisecond) - start_time
 
-    run_ts = DateTime.utc_now() |> DateTime.truncate(:second)
-    save_state(results, run_ts)
+    if state_update?(opts) do
+      run_ts = DateTime.utc_now() |> DateTime.truncate(:second)
+      save_state(results, run_ts, opts)
+    end
 
     print_summary(results, elapsed)
   end
 
   defp test_model(provider, model_id, opts) do
+    scenarios = scenarios_for_opts(opts, parse_operation_type(opts[:type]))
+
+    if Enum.empty?(scenarios) do
+      run_test_invocation(provider, model_id, opts, nil)
+    else
+      scenarios
+      |> Enum.map(&run_test_invocation(provider, model_id, opts, &1))
+      |> aggregate_scenario_results(provider, model_id)
+    end
+  end
+
+  defp run_test_invocation(provider, model_id, opts, scenario) do
     spec = "#{provider}:#{model_id}"
     mode = if opts[:record_all] || opts[:record], do: "record", else: "replay"
     operation = parse_operation_type(opts[:type])
     category = operation_to_category(operation)
+    recording = opts[:record_all] || opts[:record]
+    stage_dir = if recording, do: staged_fixture_dir(provider, model_id, scenario)
 
-    # Propagate cloud provider credentials from current environment
     cloud_env_vars =
       for key <- [
-            # AWS
             "AWS_ACCESS_KEY_ID",
             "AWS_SECRET_ACCESS_KEY",
             "AWS_SESSION_TOKEN",
             "AWS_REGION",
             "AWS_DEFAULT_REGION",
-            # Azure (family-specific and universal)
             "AZURE_OPENAI_API_KEY",
             "AZURE_OPENAI_BASE_URL",
             "AZURE_ANTHROPIC_API_KEY",
@@ -383,13 +483,15 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
       end
 
     env =
-      [
-        {"REQ_LLM_MODELS", spec},
-        {"REQ_LLM_OPERATION", Atom.to_string(operation)},
-        {"REQ_LLM_FIXTURES_MODE", mode},
-        {"REQ_LLM_DEBUG", "1"},
-        {"REQ_LLM_INCLUDE_RESPONSES", "1"}
-      ] ++ cloud_env_vars
+      ([
+         {"REQ_LLM_MODELS", spec},
+         {"REQ_LLM_OPERATION", Atom.to_string(operation)},
+         {"REQ_LLM_FIXTURES_MODE", mode},
+         {"REQ_LLM_DEBUG", "1"},
+         {"REQ_LLM_INCLUDE_RESPONSES", "1"},
+         {"REQ_LLM_FIXTURE_ALLOW_CREDENTIAL_FALLBACK", "0"}
+       ] ++ cloud_env_vars)
+      |> maybe_put_record_root(stage_dir)
 
     display_spec =
       case LLMDB.model(spec) do
@@ -400,10 +502,11 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
           spec
       end
 
-    Mix.shell().info("  Testing #{display_spec} (#{operation})...")
+    scenario_text = if scenario, do: ", scenario=#{scenario}", else: ""
+    Mix.shell().info("  Testing #{display_spec} (#{operation}#{scenario_text})...")
 
     test_args =
-      build_test_args(provider, category, operation)
+      build_test_args(provider, category, operation, scenario)
 
     {output, exit_code} =
       System.cmd(
@@ -412,6 +515,7 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
         env: env,
         stderr_to_stdout: true
       )
+      |> maybe_promote_staged_fixtures(stage_dir)
 
     if opts[:debug] do
       Mix.shell().info("\n--- Debug Output for #{spec} ---")
@@ -419,28 +523,75 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
       Mix.shell().info("--- End Debug Output ---\n")
     end
 
-    parse_test_result(provider, model_id, output, exit_code)
+    parse_test_result(provider, model_id, output, exit_code, scenario)
   end
 
-  defp build_test_args(provider, _category, operation) do
-    case operation do
-      :all ->
-        ["test", "--only", "provider:#{provider}"]
+  @doc false
+  def test_args_for(provider, operation, scenario \\ nil) do
+    provider = normalize_provider(provider)
 
-      :embedding ->
-        ["test", "test/coverage/#{provider}/embedding_test.exs", "--only", "provider:#{provider}"]
+    args =
+      scenario_test_args(provider, scenario) || base_test_args(provider, operation)
 
-      :text ->
-        [
-          "test",
-          "test/coverage/#{provider}/comprehensive_test.exs",
-          "--only",
-          "provider:#{provider}"
-        ]
+    if scenario do
+      args ++ ["--only", "scenario:#{scenario}"]
+    else
+      args ++ ["--only", "provider:#{provider}"]
     end
   end
 
-  defp parse_test_result(provider, model_id, output, exit_code) do
+  defp build_test_args(provider, _category, operation, scenario) do
+    test_args_for(provider, operation, scenario)
+  end
+
+  defp scenario_test_args(_provider, nil), do: nil
+
+  defp scenario_test_args(provider, scenario) do
+    provider
+    |> then(&Map.get(@scenario_test_files, &1, %{}))
+    |> Map.get(to_string(scenario))
+    |> case do
+      nil -> nil
+      path -> ["test", path]
+    end
+  end
+
+  defp normalize_provider(provider) when is_atom(provider), do: provider
+  defp normalize_provider(provider) when is_binary(provider), do: String.to_atom(provider)
+
+  defp base_test_args(provider, :all) do
+    ["test", "test/coverage/#{provider}"]
+  end
+
+  defp base_test_args(provider, :embedding) do
+    ["test", "test/coverage/#{provider}/embedding_test.exs"]
+  end
+
+  defp base_test_args(provider, :image) do
+    ["test", "test/coverage/#{provider}/image_generation_test.exs"]
+  end
+
+  defp base_test_args(provider, :speech) do
+    ["test", "test/coverage/#{provider}/speech_test.exs"]
+  end
+
+  defp base_test_args(provider, :transcription) do
+    ["test", "test/coverage/#{provider}/transcription_test.exs"]
+  end
+
+  defp base_test_args(provider, :rerank) do
+    ["test", "test/coverage/#{provider}/rerank_test.exs"]
+  end
+
+  defp base_test_args(provider, :ocr) do
+    ["test", "test/coverage/#{provider}/ocr_test.exs"]
+  end
+
+  defp base_test_args(provider, :text) do
+    ["test", "test/coverage/#{provider}/comprehensive_test.exs"]
+  end
+
+  defp parse_test_result(provider, model_id, output, exit_code, scenario) do
     {passed, failed, total} =
       cond do
         match = Regex.run(~r/(\d+) tests?, 0 failures/, output) ->
@@ -468,8 +619,145 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
       failed: failed,
       total: total,
       error: if(failed > 0, do: extract_error(output)),
-      fixtures: fixtures
+      fixtures: fixtures,
+      scenario: scenario
     }
+  end
+
+  defp aggregate_scenario_results(results, provider, model_id) do
+    status =
+      if Enum.all?(results, &(&1.status == :pass)) do
+        :pass
+      else
+        :fail
+      end
+
+    scenarios =
+      Enum.map(results, fn result ->
+        %{
+          "scenario" => result.scenario,
+          "status" => Atom.to_string(result.status),
+          "fixtures" => result.fixtures,
+          "error" => result.error
+        }
+      end)
+
+    errors =
+      results
+      |> Enum.map(& &1.error)
+      |> Enum.reject(&is_nil/1)
+
+    %{
+      provider: provider,
+      model_id: model_id,
+      model_spec: "#{provider}:#{model_id}",
+      status: status,
+      passed: Enum.reduce(results, 0, &(&1.passed + &2)),
+      failed: Enum.reduce(results, 0, &(&1.failed + &2)),
+      total: Enum.reduce(results, 0, &(&1.total + &2)),
+      error: if(errors == [], do: nil, else: Enum.join(errors, "\n")),
+      fixtures:
+        results
+        |> Enum.flat_map(& &1.fixtures)
+        |> Enum.uniq(),
+      scenarios: scenarios
+    }
+  end
+
+  defp csv_values(nil), do: []
+
+  defp csv_values(value) when is_binary(value) do
+    value
+    |> String.split([",", " "], trim: true)
+    |> Enum.map(&String.trim/1)
+    |> Enum.reject(&(&1 == ""))
+  end
+
+  defp max_concurrency(opts) do
+    cond do
+      is_integer(opts[:max_concurrency]) and opts[:max_concurrency] > 0 ->
+        opts[:max_concurrency]
+
+      opts[:record_all] || opts[:record] ->
+        1
+
+      true ->
+        System.schedulers_online() * 2
+    end
+  end
+
+  defp staged_fixture_dir(provider, model_id, scenario) do
+    suffix =
+      [to_string(provider), model_id, scenario || "all", System.unique_integer([:positive])]
+      |> Enum.map(&to_string/1)
+      |> Enum.map_join("_", &fixture_path_slug/1)
+
+    Path.join(System.tmp_dir!(), "req_llm_fixture_record_#{suffix}")
+  end
+
+  defp maybe_put_record_root(env, nil), do: env
+
+  defp maybe_put_record_root(env, stage_dir) do
+    [{"REQ_LLM_FIXTURE_RECORD_ROOT", stage_dir} | env]
+  end
+
+  defp maybe_promote_staged_fixtures({output, exit_code}, nil), do: {output, exit_code}
+
+  defp maybe_promote_staged_fixtures({output, 0}, stage_dir) do
+    files = staged_fixture_files(stage_dir)
+
+    if files == [] do
+      File.rm_rf(stage_dir)
+      {output <> "\n[Fixture] ERROR no fixture files were recorded\n", 1}
+    else
+      Enum.each(files, &promote_staged_fixture(stage_dir, &1))
+      File.rm_rf(stage_dir)
+      {output <> promoted_fixture_output(files), 0}
+    end
+  rescue
+    error ->
+      File.rm_rf(stage_dir)
+      {output <> "\n[Fixture] ERROR staging promotion failed: #{inspect(error)}\n", 1}
+  end
+
+  defp maybe_promote_staged_fixtures({output, exit_code}, stage_dir) do
+    File.rm_rf(stage_dir)
+    {output, exit_code}
+  end
+
+  defp staged_fixture_files(stage_dir) do
+    if File.dir?(stage_dir) do
+      stage_dir
+      |> Path.join("**/*.json")
+      |> Path.wildcard()
+    else
+      []
+    end
+  end
+
+  defp promote_staged_fixture(stage_dir, staged_path) do
+    relative = Path.relative_to(staged_path, stage_dir)
+    target = Path.join(fixture_path_root(), relative)
+    target |> Path.dirname() |> File.mkdir_p!()
+    File.cp!(staged_path, target)
+  end
+
+  defp fixture_path_root do
+    Path.expand("test/support/fixtures")
+  end
+
+  defp fixture_path_slug(model_name) when is_binary(model_name) do
+    model_name
+    |> String.downcase()
+    |> String.replace(~r/[^a-z0-9]+/u, "_")
+    |> String.trim("_")
+  end
+
+  defp promoted_fixture_output(files) do
+    files
+    |> Enum.map(&Path.basename(&1, ".json"))
+    |> Enum.sort()
+    |> Enum.map_join("", &"\n[Fixture] promoted: name=#{&1}")
   end
 
   defp extract_error(output) do
@@ -484,7 +772,7 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
   defp extract_fixtures(output) do
     output
     |> String.split("\n")
-    |> Enum.filter(&String.contains?(&1, "[Fixture] step:"))
+    |> Enum.filter(&String.contains?(&1, ["[Fixture] step:", "[Fixture] promoted:"]))
     |> Enum.map(fn line ->
       case Regex.run(~r/name=(\w+)/, line) do
         [_, name] -> name
@@ -931,7 +1219,10 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
         candidates
       end
 
-    final |> Enum.uniq() |> Enum.sort()
+    final
+    |> Enum.map(&canonical_pair(registry, &1))
+    |> Enum.uniq()
+    |> Enum.sort()
   end
 
   defp default_specs_for_operation(:text) do
@@ -942,9 +1233,34 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
     Application.get_env(:req_llm, :sample_embedding_models, [])
   end
 
+  defp default_specs_for_operation(:image) do
+    Application.get_env(:req_llm, :sample_image_models, [])
+  end
+
+  defp default_specs_for_operation(:speech) do
+    Application.get_env(:req_llm, :sample_speech_models, [])
+  end
+
+  defp default_specs_for_operation(:transcription) do
+    Application.get_env(:req_llm, :sample_transcription_models, [])
+  end
+
+  defp default_specs_for_operation(:rerank) do
+    Application.get_env(:req_llm, :sample_rerank_models, [])
+  end
+
+  defp default_specs_for_operation(:ocr) do
+    Application.get_env(:req_llm, :sample_ocr_models, [])
+  end
+
   defp default_specs_for_operation(:all) do
     Application.get_env(:req_llm, :sample_text_models, []) ++
-      Application.get_env(:req_llm, :sample_embedding_models, [])
+      Application.get_env(:req_llm, :sample_embedding_models, []) ++
+      Application.get_env(:req_llm, :sample_image_models, []) ++
+      Application.get_env(:req_llm, :sample_speech_models, []) ++
+      Application.get_env(:req_llm, :sample_transcription_models, []) ++
+      Application.get_env(:req_llm, :sample_rerank_models, []) ++
+      Application.get_env(:req_llm, :sample_ocr_models, [])
   end
 
   defp parse_spec_tuple(spec) when is_binary(spec) do
@@ -960,24 +1276,11 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
 
   defp model_supports_operation?(_registry, _p, _m, :all), do: true
 
-  defp model_supports_operation?(registry, provider, model_id, :embedding) do
+  defp model_supports_operation?(registry, provider, model_id, operation) do
     case find_model(registry, provider, model_id) do
       nil -> false
-      model -> embedding_model?(model)
+      model -> ReqLLM.ModelOperation.supported?(model, operation)
     end
-  end
-
-  defp model_supports_operation?(registry, provider, model_id, :text) do
-    case find_model(registry, provider, model_id) do
-      nil -> false
-      model -> not embedding_model?(model)
-    end
-  end
-
-  defp embedding_model?(model) do
-    t = Map.get(model, "type")
-    outputs = get_in(model, ["modalities", "output"]) || []
-    t == "embedding" or Enum.member?(outputs, "embedding")
   end
 
   defp expand_spec_to_candidates(registry, spec, implemented) do
@@ -1017,8 +1320,8 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
 
                 []
 
-              _ ->
-                [{provider_atom, model_part}]
+              model ->
+                [{provider_atom, model["id"]}]
             end
         end
 
@@ -1060,15 +1363,12 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
   defp sample_model_set(operation, _registry, current_candidates) do
     cfg =
       case operation do
-        :text ->
-          Application.get_env(:req_llm, :sample_text_models, [])
-
-        :embedding ->
-          Application.get_env(:req_llm, :sample_embedding_models, [])
+        operation
+        when operation in [:text, :embedding, :image, :speech, :transcription, :rerank, :ocr] ->
+          Application.get_env(:req_llm, ReqLLM.ModelOperation.config_key(operation), [])
 
         :all ->
-          Application.get_env(:req_llm, :sample_text_models, []) ++
-            Application.get_env(:req_llm, :sample_embedding_models, [])
+          default_specs_for_operation(:all)
       end
 
     sample_specs =
@@ -1086,6 +1386,13 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
       end
 
     MapSet.new(sample_specs)
+  end
+
+  defp canonical_pair(registry, {provider, model_id}) do
+    case find_model(registry, provider, model_id) do
+      %{"id" => canonical_id} -> {provider, canonical_id}
+      _ -> {provider, model_id}
+    end
   end
 
   defp filter_by_specs(models, _provider, nil), do: models
@@ -1106,9 +1413,13 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
 
           %{
             "id" => model.id,
+            "provider" => model.provider,
             "type" => infer_type(model),
             "tier" => tier,
-            "modalities" => model.modalities
+            "modalities" => model.modalities,
+            "capabilities" => model.capabilities,
+            "family" => model.family,
+            "provider_model_id" => model.provider_model_id
           }
         end)
 
@@ -1119,11 +1430,7 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
   end
 
   defp infer_type(model) do
-    if model.capabilities && model.capabilities.embeddings != false do
-      "embedding"
-    else
-      "text"
-    end
+    ReqLLM.ModelOperation.type(model)
   end
 
   defp extract_tier(tags) when is_list(tags) do
@@ -1150,7 +1457,15 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
     end
   end
 
-  defp save_state(results, run_ts) do
+  defp save_state(results, run_ts, opts) do
+    if Enum.any?(results, &Map.has_key?(&1, :scenarios)) or scenarios_for_opts(opts) != [] do
+      save_scenario_state(results, run_ts, opts)
+    else
+      save_model_state(results, run_ts)
+    end
+  end
+
+  defp save_model_state(results, run_ts) do
     priv_dir = :code.priv_dir(:req_llm)
     path = Path.join(priv_dir, "supported_models.json")
 
@@ -1192,6 +1507,71 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
       {:ok, prev} when prev == json -> :ok
       _ -> File.write!(path, json)
     end
+  end
+
+  defp save_scenario_state(results, run_ts, opts) do
+    priv_dir = :code.priv_dir(:req_llm)
+    path = Path.join(priv_dir, "model_compat_scenarios.json")
+
+    existing =
+      case File.read(path) do
+        {:ok, content} -> Jason.decode!(content)
+        _ -> %{}
+      end
+
+    ts = DateTime.to_iso8601(run_ts)
+    mode = if opts[:record_all] || opts[:record], do: "record", else: "replay"
+
+    new_state =
+      Enum.reduce(results, existing, fn result, acc ->
+        scenarios = Map.get(result, :scenarios) || scenario_entries_for_result(result)
+
+        Enum.reduce(scenarios, acc, fn scenario, scenario_acc ->
+          put_scenario_state(scenario_acc, result.model_spec, scenario, ts, mode)
+        end)
+      end)
+
+    json = Jason.encode!(new_state, pretty: true)
+
+    case File.read(path) do
+      {:ok, prev} when prev == json -> :ok
+      _ -> File.write!(path, json)
+    end
+  end
+
+  defp scenario_entries_for_result(%{scenario: nil}), do: []
+
+  defp scenario_entries_for_result(result) do
+    [
+      %{
+        "scenario" => result.scenario,
+        "status" => Atom.to_string(result.status),
+        "fixtures" => result.fixtures,
+        "error" => result.error
+      }
+    ]
+  end
+
+  defp put_scenario_state(state, model_spec, scenario, ts, mode) do
+    scenario_name = scenario["scenario"]
+
+    model_state =
+      state
+      |> Map.get(model_spec, %{})
+      |> Map.put_new("scenarios", %{})
+
+    scenario_state = %{
+      "status" => scenario["status"],
+      "last_checked" => ts,
+      "mode" => mode,
+      "fixtures" => scenario["fixtures"] || [],
+      "error" => scenario["error"]
+    }
+
+    updated_model_state =
+      put_in(model_state, ["scenarios", scenario_name], scenario_state)
+
+    Map.put(state, model_spec, updated_model_state)
   end
 
   defp build_sorted_json(state) do
@@ -1283,15 +1663,19 @@ defmodule Mix.Tasks.ReqLlm.ModelCompat do
     end
   end
 
-  defp parse_operation_type(nil), do: :text
-  defp parse_operation_type("all"), do: :all
-  defp parse_operation_type("text"), do: :text
-  defp parse_operation_type("embedding"), do: :embedding
-  defp parse_operation_type(type), do: String.to_atom(type)
+  defp parse_operation_type(type) do
+    operation = ReqLLM.ModelOperation.normalize(type)
 
-  defp operation_to_category(:text), do: "core"
-  defp operation_to_category(:embedding), do: "embedding"
-  defp operation_to_category(_), do: "core"
+    if ReqLLM.ModelOperation.known?(operation) do
+      operation
+    else
+      Mix.raise(
+        "Unknown operation type: #{inspect(type)}. Expected one of: #{Enum.join(ReqLLM.ModelOperation.names(), ", ")}"
+      )
+    end
+  end
+
+  defp operation_to_category(operation), do: ReqLLM.ModelOperation.category(operation)
 
   defp has_fixtures?(provider, model_id) do
     model_dir = model_id_to_fixture_dir(model_id)

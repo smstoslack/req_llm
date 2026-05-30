@@ -1,0 +1,123 @@
+{
+  "model_spec": "google:gemini-3.1-pro-preview",
+  "provider": "google",
+  "request": {
+    "body": {
+      "b64": "eyJjb250ZW50cyI6W3sicGFydHMiOlt7InRleHQiOiJIZWxsbyB3b3JsZCEifV0sInJvbGUiOiJ1c2VyIn1dLCJnZW5lcmF0aW9uQ29uZmlnIjp7ImNhbmRpZGF0ZUNvdW50IjoxLCJtYXhPdXRwdXRUb2tlbnMiOjIwMDAsInRlbXBlcmF0dXJlIjowLjAsInRoaW5raW5nQ29uZmlnIjp7ImluY2x1ZGVUaG91Z2h0cyI6dHJ1ZSwidGhpbmtpbmdMZXZlbCI6ImxvdyJ9fX0="
+    },
+    "canonical_json": {
+      "contents": [
+        {
+          "parts": [
+            {
+              "text": "Hello world!"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "generationConfig": {
+        "candidateCount": 1,
+        "maxOutputTokens": 2000,
+        "temperature": 0.0,
+        "thinkingConfig": {
+          "includeThoughts": true,
+          "thinkingLevel": "low"
+        }
+      }
+    },
+    "headers": {
+      "accept": [
+        "application/json"
+      ],
+      "accept-encoding": [
+        "gzip"
+      ],
+      "content-type": [
+        "application/json"
+      ],
+      "user-agent": [
+        "req/0.5.18"
+      ]
+    },
+    "method": "post",
+    "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=[REDACTED]"
+  },
+  "response": {
+    "body": {
+      "candidates": [
+        {
+          "content": {
+            "parts": [
+              {
+                "text": "**My Response to \"Hello World!\"**\n\nOkay, so the user gave me the classic \"Hello world!\" greeting. Hmm, not much to go on, but that's alright. My immediate reaction is to analyze that phrase; it's practically a programming litmus test, a friendly hello, but in my world, it's also a signal.\n\nMy goal is clear: be friendly, welcoming, and, most importantly, *helpful*. I need to put the ball in their court and let them know I'm ready to assist.\n\nI have a couple of thoughts in my head right now. My first draft is: \"Hello! How can I help you today?\". Very standard, very polite. Or, I could say: \"Hello world! How can I assist you today?\". It does acknowledge the greeting directly.\n\nUltimately, I think the first one is best. It's concise, welcoming, and doesn't get hung up on the \"world\" aspect, opening the floor for the user to state their requirements, it's the most flexible and I've found it a good standard. Let's go with that.\n\n\n",
+                "thought": true
+              },
+              {
+                "text": "Hello! How can I help you today?",
+                "thoughtSignature": "EswFCskFAQw51sdVgnwX/fHdhGZ+Zmbzr90FPbjPwK8vuKKDbIqXqvxl6vpKvJPLLbkFeDARLy8zjTMHasYx++0qXnpkuMD0is5bVLe3xNXx+rKM1YivbQCCQQfEVc3Zz3gpjQFS9f26Ho8ip27sSjTcNi3r9xL2z2OrcwforWS+gajd+WWFhW18iA490EH2Mv5dI34AFTIEj53U37oJQwhlPvh9f38+xnH/3ArS87Ce9Yyr1oG2kr+XGqu6U+deZLge2qk0fS7VPmUYPP0uUXnFosQRIpLUoHIpIPLwXpKmdkYnVeE/xRKCBbwz6gQ+Qb805wJaoRzgAnu9TZRw6fnjofZW6nY2T9JPTmFIT0xSo/t45J6r6G5FnpYXuB/7gyVfijq2IO5xgE2Fz3RISAOwwsnoyqdybmvrMNGFV+JGx+9MW4ZXu4TLUO+oTJNqB33ij0KwxQk0UJ+iZxN3v/NGGcvkNMZFPKyfdlEPHkuV46Me/e3GwueYxt8Xs2CecfBMrLcvUqnryPpng29oCjcdk06FUQKc+xEdntqSYtku+rCGIAIQv5wAZXxvoJdQoYLmLqbSNd3AzOFm18GDx6XBWh/pP6DcIOzycKpWwdgDIUSKNm7k86RccfputkHWFBnfPIWWVy8YZqdkBsz6Ex51VQr13zsOSQq1Zu3G3O8E7GSuZgu6cmGvMElIe8IQ7r2L/3lJoYvGrigOuRYr3K582swKuMZZUX8zNLL5IbCIHPEsmnotCbxjp5+yVS6X/T/BF2iYAKHE2kiuNd86wHeW9mmq+8g5hV2UvgZ05JdcJT9TGopjF8oTEa2WpvETKx26ThBQlpgvlCi12SfqbefdxtjHnJ5kysTaYVYi3YHxdWZ5QmoPyRIegzWgdAB76U3LclmnHmd5hCkN234rX4+OjBH/cV9nvoW2dHyW7nVtiIakutEC1q7qHK4fh0E="
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        }
+      ],
+      "modelVersion": "gemini-3.1-pro-preview",
+      "responseId": "czYaatG-LtaUjrEPhdT28Ac",
+      "usageMetadata": {
+        "candidatesTokenCount": 9,
+        "promptTokenCount": 4,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 4
+          }
+        ],
+        "serviceTier": "standard",
+        "thoughtsTokenCount": 182,
+        "totalTokenCount": 195
+      }
+    },
+    "headers": {
+      "alt-svc": [
+        "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+      ],
+      "content-type": [
+        "application/json; charset=UTF-8"
+      ],
+      "date": [
+        "Sat, 30 May 2026 00:59:35 GMT"
+      ],
+      "server": [
+        "scaffolding on HTTPServer2"
+      ],
+      "server-timing": [
+        "gfet4t7; dur=4162"
+      ],
+      "transfer-encoding": [
+        "chunked"
+      ],
+      "vary": [
+        "Origin",
+        "X-Origin",
+        "Referer"
+      ],
+      "x-content-type-options": [
+        "nosniff"
+      ],
+      "x-frame-options": [
+        "SAMEORIGIN"
+      ],
+      "x-gemini-service-tier": [
+        "standard"
+      ],
+      "x-xss-protection": [
+        "0"
+      ]
+    },
+    "status": 200
+  },
+  "streaming": false
+}

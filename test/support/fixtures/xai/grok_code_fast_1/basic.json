@@ -1,4 +1,6 @@
 {
+  "model_spec": "xai:grok-code-fast-1",
+  "provider": "xai",
   "request": {
     "body": {
       "b64": "eyJtYXhfY29tcGxldGlvbl90b2tlbnMiOjUwLCJtZXNzYWdlcyI6W3siY29udGVudCI6IkhlbGxvIHdvcmxkISIsInJvbGUiOiJ1c2VyIn1dLCJtb2RlbCI6Imdyb2stY29kZS1mYXN0LTEiLCJzZWVkIjo0Miwic3RyZWFtIjpmYWxzZSwidGVtcGVyYXR1cmUiOjAuMH0="
@@ -17,6 +19,9 @@
       "temperature": 0.0
     },
     "headers": {
+      "accept": [
+        "application/json"
+      ],
       "accept-encoding": [
         "gzip"
       ],
@@ -25,7 +30,7 @@
         "application/json"
       ],
       "user-agent": [
-        "req/0.5.15"
+        "req/0.5.18"
       ]
     },
     "method": "post",
@@ -38,34 +43,36 @@
           "finish_reason": "stop",
           "index": 0,
           "message": {
-            "content": "Hello! If you're channeling your inner programmer, nice to meet you. I'm Grok, built by xAI to help with questions, ideas, or just some cosmic banter. What can I do for you today? 🚀",
+            "content": "Hello, world! 👋\n\nHow can I help you today?",
+            "reasoning_content": "Hello! I'm Grok, built by xAI. What's on your mind? \n\n## Explanation\n\nThe response is constructed to establish immediate rapport by mirroring the user's greeting while incorporating a concise self-introduction that aligns with the persona of an AI developed by xAI, emphasizing helpfulness and truthfulness.",
             "refusal": null,
             "role": "assistant"
           }
         }
       ],
-      "created": 1762103802,
-      "id": "50908f1a-61ac-5ab2-a790-b80bd3b8c798_us-east-1",
-      "model": "grok-code-fast-1",
+      "created": 1780103150,
+      "id": "086e7bdf-8188-978c-bcd8-b8b95826c4fa",
+      "model": "grok-build-0.1",
       "object": "chat.completion",
-      "system_fingerprint": "fp_10f00c862d",
+      "system_fingerprint": "fp_1baab189745f3e87",
       "usage": {
-        "completion_tokens": 45,
+        "completion_tokens": 14,
         "completion_tokens_details": {
           "accepted_prediction_tokens": 0,
           "audio_tokens": 0,
-          "reasoning_tokens": 187,
+          "reasoning_tokens": 245,
           "rejected_prediction_tokens": 0
         },
+        "cost_in_usd_ticks": 5938000,
         "num_sources_used": 0,
-        "prompt_tokens": 207,
+        "prompt_tokens": 127,
         "prompt_tokens_details": {
           "audio_tokens": 0,
-          "cached_tokens": 192,
+          "cached_tokens": 64,
           "image_tokens": 0,
-          "text_tokens": 207
+          "text_tokens": 127
         },
-        "total_tokens": 439
+        "total_tokens": 386
       }
     },
     "headers": {
@@ -79,7 +86,7 @@
         "DYNAMIC"
       ],
       "cf-ray": [
-        "998547fa9ccce239-ORD"
+        "a039d5302ff62311-ORD"
       ],
       "connection": [
         "keep-alive"
@@ -88,16 +95,17 @@
         "application/json"
       ],
       "date": [
-        "Sun, 02 Nov 2025 17:16:45 GMT"
+        "Sat, 30 May 2026 01:06:11 GMT"
       ],
       "server": [
         "cloudflare"
       ],
-      "set-cookie": [
-        "__cf_bm=Ql0xtAuxevIj03EatPizVni4Mdr44RvYd53zT9xlkCE-1762103805-1.0.1.1-rzHDX3s8vvvmrx0GW3bA573I4ZiazLRzTLDK6bdsgXa2qvnbAeBKNrE2o78GWg0gZ_foGaBQx3j.4JZv5iwIf1EpG_tFcFx1jyb07wR1N6k; path=/; expires=Sun, 02-Nov-25 17:46:45 GMT; domain=.x.ai; HttpOnly; Secure; SameSite=None"
-      ],
+      "set-cookie": "[REDACTED:set-cookie]",
       "strict-transport-security": [
         "max-age=31536000"
+      ],
+      "traceparent": [
+        "00-b891fdb7cc2625b0588dde6e2c724df4-c3c2420900001352-01"
       ],
       "transfer-encoding": [
         "chunked"
@@ -105,13 +113,35 @@
       "vary": [
         "origin, access-control-request-method, access-control-request-headers"
       ],
+      "x-metrics-e2e-ms": [
+        "1843.5"
+      ],
+      "x-metrics-mean-itl-ms": [
+        "6.2"
+      ],
+      "x-metrics-ttft-ms": [
+        "144.8"
+      ],
+      "x-ratelimit-limit-requests": [
+        "1800"
+      ],
+      "x-ratelimit-limit-tokens": [
+        "10000000"
+      ],
+      "x-ratelimit-remaining-requests": [
+        "1800"
+      ],
+      "x-ratelimit-remaining-tokens": [
+        "10000000"
+      ],
       "x-request-id": [
-        "00-2939a7457662ec68a70f9d2278ee5fe5-59bd9c35006e9423-01"
+        "086e7bdf-8188-978c-bcd8-b8b95826c4fa"
       ],
       "x-zero-data-retention": [
         "false"
       ]
     },
     "status": 200
-  }
+  },
+  "streaming": false
 }

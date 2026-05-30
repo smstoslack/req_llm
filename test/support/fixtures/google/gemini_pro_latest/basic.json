@@ -1,0 +1,114 @@
+{
+  "model_spec": "google:gemini-pro-latest",
+  "provider": "google",
+  "request": {
+    "body": {
+      "b64": "eyJjb250ZW50cyI6W3sicGFydHMiOlt7InRleHQiOiJIZWxsbyB3b3JsZCEifV0sInJvbGUiOiJ1c2VyIn1dLCJnZW5lcmF0aW9uQ29uZmlnIjp7ImNhbmRpZGF0ZUNvdW50IjoxLCJtYXhPdXRwdXRUb2tlbnMiOjUwLCJ0ZW1wZXJhdHVyZSI6MC4wfX0="
+    },
+    "canonical_json": {
+      "contents": [
+        {
+          "parts": [
+            {
+              "text": "Hello world!"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "generationConfig": {
+        "candidateCount": 1,
+        "maxOutputTokens": 50,
+        "temperature": 0.0
+      }
+    },
+    "headers": {
+      "accept": [
+        "application/json"
+      ],
+      "accept-encoding": [
+        "gzip"
+      ],
+      "content-type": [
+        "application/json"
+      ],
+      "user-agent": [
+        "req/0.5.18"
+      ]
+    },
+    "method": "post",
+    "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-latest:generateContent?key=[REDACTED]"
+  },
+  "response": {
+    "body": {
+      "candidates": [
+        {
+          "content": {
+            "parts": [
+              {
+                "text": "Hello",
+                "thoughtSignature": "EoUCCoICAQw51sd0A1tRWCgNShAdwPbQ5RJ/fqtS5c8JeGuV7f6x6Ts03ApY/146vPiwvEQTApjGw1EObA4K7K1dhJ/cm7hkvgzk0p12WcAYoPzmiPdZyckIbqXlDjyXvAEsFUmNFnFzQUux9OdBmXcf7ZTy+6LXsgQFUPpJUpkMzfNMdLKcmN9P+timECxr9k10WI9yDJ++Mx4xPu43Sbi7Vc9oi94E9jidD3k6BnTvrEnO6qGCvzVY/CHsIBbV8Efoipob5AkRxpvG+BANSxG2ZV3N/VoYH74VRmSjJGpIZ0Q6eeqH5BEmEeGmdiQ/WqSiaWxUGBLtMxFR/3Sob3KHbsUNMo+K"
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "MAX_TOKENS",
+          "index": 0
+        }
+      ],
+      "modelVersion": "gemini-3.1-pro-preview",
+      "responseId": "qTYaarmCMa6W-8YPxp-a8QM",
+      "usageMetadata": {
+        "promptTokenCount": 4,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 4
+          }
+        ],
+        "serviceTier": "standard",
+        "thoughtsTokenCount": 45,
+        "totalTokenCount": 49
+      }
+    },
+    "headers": {
+      "alt-svc": [
+        "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+      ],
+      "content-type": [
+        "application/json; charset=UTF-8"
+      ],
+      "date": [
+        "Sat, 30 May 2026 01:00:27 GMT"
+      ],
+      "server": [
+        "scaffolding on HTTPServer2"
+      ],
+      "server-timing": [
+        "gfet4t7; dur=1771"
+      ],
+      "transfer-encoding": [
+        "chunked"
+      ],
+      "vary": [
+        "Origin",
+        "X-Origin",
+        "Referer"
+      ],
+      "x-content-type-options": [
+        "nosniff"
+      ],
+      "x-frame-options": [
+        "SAMEORIGIN"
+      ],
+      "x-gemini-service-tier": [
+        "standard"
+      ],
+      "x-xss-protection": [
+        "0"
+      ]
+    },
+    "status": 200
+  },
+  "streaming": false
+}

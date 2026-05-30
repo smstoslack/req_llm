@@ -1,0 +1,114 @@
+{
+  "model_spec": "cohere:rerank-v3.5",
+  "provider": "cohere",
+  "request": {
+    "body": {
+      "b64": "eyJkb2N1bWVudHMiOlsiQ2Fyc29uIENpdHkiLCJXYXNoaW5ndG9uLCBELkMuIiwiU2FpcGFuIl0sIm1vZGVsIjoicmVyYW5rLXYzLjUiLCJxdWVyeSI6ImNhcGl0YWwgb2YgdGhlIFVuaXRlZCBTdGF0ZXMiLCJ0b3BfbiI6Mn0="
+    },
+    "canonical_json": {
+      "documents": [
+        "Carson City",
+        "Washington, D.C.",
+        "Saipan"
+      ],
+      "model": "rerank-v3.5",
+      "query": "capital of the United States",
+      "top_n": 2
+    },
+    "headers": {
+      "accept": [
+        "application/json"
+      ],
+      "accept-encoding": [
+        "gzip"
+      ],
+      "authorization": "[REDACTED:authorization]",
+      "content-type": [
+        "application/json"
+      ],
+      "user-agent": [
+        "req/0.5.18"
+      ]
+    },
+    "method": "post",
+    "url": "https://api.cohere.com/v2/rerank"
+  },
+  "response": {
+    "body": {
+      "id": "835acba6-2b3d-48b2-a5d1-773ecce8759b",
+      "meta": {
+        "api_version": {
+          "version": "2"
+        },
+        "billed_units": {
+          "search_units": 1
+        }
+      },
+      "results": [
+        {
+          "index": 1,
+          "relevance_score": 0.6141863
+        },
+        {
+          "index": 0,
+          "relevance_score": 0.104981124
+        }
+      ]
+    },
+    "headers": {
+      "access-control-expose-headers": [
+        "X-Debug-Trace-ID"
+      ],
+      "alt-svc": [
+        "h3=\":443\"; ma=2592000"
+      ],
+      "cache-control": [
+        "no-cache, no-store, no-transform, must-revalidate, private, max-age=0"
+      ],
+      "content-type": [
+        "application/json"
+      ],
+      "date": [
+        "Fri, 29 May 2026 23:28:28 GMT"
+      ],
+      "expires": [
+        "Thu, 01 Jan 1970 00:00:00 GMT"
+      ],
+      "pragma": [
+        "no-cache"
+      ],
+      "server": [
+        "envoy"
+      ],
+      "transfer-encoding": [
+        "chunked"
+      ],
+      "vary": [
+        "Origin,Accept-Encoding"
+      ],
+      "via": [
+        "1.1 google"
+      ],
+      "x-accel-expires": [
+        "0"
+      ],
+      "x-debug-trace-id": [
+        "96184d95c3794d4563cad00eb20f339d"
+      ],
+      "x-endpoint-monthly-call-limit": [
+        "1000"
+      ],
+      "x-envoy-upstream-service-time": [
+        "60"
+      ],
+      "x-trial-endpoint-call-limit": [
+        "10"
+      ],
+      "x-trial-endpoint-call-remaining": [
+        "7"
+      ]
+    },
+    "status": 200
+  },
+  "streaming": false
+}

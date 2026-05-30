@@ -1,0 +1,123 @@
+{
+  "model_spec": "google:gemini-3.5-flash",
+  "provider": "google",
+  "request": {
+    "body": {
+      "b64": "eyJjb250ZW50cyI6W3sicGFydHMiOlt7InRleHQiOiJIZWxsbyB3b3JsZCEifV0sInJvbGUiOiJ1c2VyIn1dLCJnZW5lcmF0aW9uQ29uZmlnIjp7ImNhbmRpZGF0ZUNvdW50IjoxLCJtYXhPdXRwdXRUb2tlbnMiOjIwMDAsInRlbXBlcmF0dXJlIjowLjAsInRoaW5raW5nQ29uZmlnIjp7ImluY2x1ZGVUaG91Z2h0cyI6dHJ1ZSwidGhpbmtpbmdMZXZlbCI6ImxvdyJ9fX0="
+    },
+    "canonical_json": {
+      "contents": [
+        {
+          "parts": [
+            {
+              "text": "Hello world!"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "generationConfig": {
+        "candidateCount": 1,
+        "maxOutputTokens": 2000,
+        "temperature": 0.0,
+        "thinkingConfig": {
+          "includeThoughts": true,
+          "thinkingLevel": "low"
+        }
+      }
+    },
+    "headers": {
+      "accept": [
+        "application/json"
+      ],
+      "accept-encoding": [
+        "gzip"
+      ],
+      "content-type": [
+        "application/json"
+      ],
+      "user-agent": [
+        "req/0.5.18"
+      ]
+    },
+    "method": "post",
+    "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=[REDACTED]"
+  },
+  "response": {
+    "body": {
+      "candidates": [
+        {
+          "content": {
+            "parts": [
+              {
+                "text": "**My Processing of \"Hello World!\"**\n\nOkay, so the user types \"Hello world!\". Classic. That's practically a programmer's handshake. My processors immediately kicked in: analyze the input, determine the best course of action. I need to be friendly, welcoming, and open-ended. I don't want to assume anything about their intent – are they testing me, starting a project, just curious? I considered a few options, weighing them for their efficacy. \"Hello! How can I help you today?\" is safe, but a little bland. Adding the \"World!\" felt more playful and appropriate given the context, like acknowledging the significance of that phrase. So, after a quick mental debate, I landed on \"Hello, World! How can I help you today?\". It's a nice balance of familiarity, warmth, and a clear invitation to proceed. Done.\n\n\n",
+                "thought": true
+              },
+              {
+                "text": "Hello, World! How can I help you today?",
+                "thoughtSignature": "EtcECtQEAQw51sfh3CadPcrM/gni3/vPjlnEoMUBAMJ36qDUAEFt7ifAkid4KDOKt/Pl4bxO9A49P9PXWy+uZtsQAPQ0Kj8CUo2jzvjooV0S0uFg2gFVStUG+SGCH58mUr1D8CC1JM6IYycxDQJgYSHBW+yanYGFaAVgTk0MK1ERI8QbMVlWjYoCSXRKLfEqVm5ado7rBPpuX669k9Fyfs2m34c1sY5/kkxJ4jfj684yc2KMoYcRqTkTp6dft0utaWYEqLMnoy+JS6fsmtrDWFc925g+5ou4rrI3wi42tYpxWqspxEMUG0knSgUy0yMeizUhWMe9mScdEgqtfdKHWChlWzsJN266vw1HOOBnb8YJEz4POU2/yHdj11vkY0hQayAbfyAjebbvWKGSwcjIzrapKI0Oeh6/twQsvPsYwbck0mnvNvD1vMWxM/pQjb5b6EOQEIs0xPJsEzJiRuUdB+LkvRmo3YbaObyKDrsVXWSwiudJWv/nhuloz+lmLhJpDA129QJLAq1B3o/udhDXHum2xCs6Qg7Dt03YZgyZU6ZkZ+rTmtQKUX6K5CKJGJ63aCVn/XvHSgS9yVFrrFZF7TLSrGOBOcdot9Nglm3OFwlxIOIOR061Hf1roovvTh+mLyfwRsMSgYfSBjaxn6/mE+Ap4NtOk/mclCBvK4KE7pjWE8h/BWCqGFxOVkLykHSZ5ab2CrhYONgfNixom3ezLCVCxO2AQeomJr+8r9mtZke8wU94OZC7f1klI/1/HvZau4ZCyyqcWC7sri4jcmqYruBj9fJiwMbHTxk="
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        }
+      ],
+      "modelVersion": "gemini-3.5-flash",
+      "responseId": "iTYaarr8EOGQ-8YPs5mQ-Qc",
+      "usageMetadata": {
+        "candidatesTokenCount": 11,
+        "promptTokenCount": 4,
+        "promptTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 4
+          }
+        ],
+        "serviceTier": "standard",
+        "thoughtsTokenCount": 143,
+        "totalTokenCount": 158
+      }
+    },
+    "headers": {
+      "alt-svc": [
+        "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+      ],
+      "content-type": [
+        "application/json; charset=UTF-8"
+      ],
+      "date": [
+        "Sat, 30 May 2026 00:59:56 GMT"
+      ],
+      "server": [
+        "scaffolding on HTTPServer2"
+      ],
+      "server-timing": [
+        "gfet4t7; dur=2849"
+      ],
+      "transfer-encoding": [
+        "chunked"
+      ],
+      "vary": [
+        "Origin",
+        "X-Origin",
+        "Referer"
+      ],
+      "x-content-type-options": [
+        "nosniff"
+      ],
+      "x-frame-options": [
+        "SAMEORIGIN"
+      ],
+      "x-gemini-service-tier": [
+        "standard"
+      ],
+      "x-xss-protection": [
+        "0"
+      ]
+    },
+    "status": 200
+  },
+  "streaming": false
+}

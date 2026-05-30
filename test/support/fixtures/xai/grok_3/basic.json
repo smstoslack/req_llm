@@ -1,4 +1,6 @@
 {
+  "model_spec": "xai:grok-3",
+  "provider": "xai",
   "request": {
     "body": {
       "b64": "eyJtYXhfY29tcGxldGlvbl90b2tlbnMiOjUwLCJtZXNzYWdlcyI6W3siY29udGVudCI6IkhlbGxvIHdvcmxkISIsInJvbGUiOiJ1c2VyIn1dLCJtb2RlbCI6Imdyb2stMyIsInNlZWQiOjQyLCJzdHJlYW0iOmZhbHNlLCJ0ZW1wZXJhdHVyZSI6MC4wfQ=="
@@ -17,6 +19,9 @@
       "temperature": 0.0
     },
     "headers": {
+      "accept": [
+        "application/json"
+      ],
       "accept-encoding": [
         "gzip"
       ],
@@ -25,7 +30,7 @@
         "application/json"
       ],
       "user-agent": [
-        "req/0.5.15"
+        "req/0.5.18"
       ]
     },
     "method": "post",
@@ -38,34 +43,36 @@
           "finish_reason": "stop",
           "index": 0,
           "message": {
-            "content": "Hey there! \"Hello world!\"—starting with the classics, I see! How can I help you today? 😊",
+            "content": "Hello, World! 👋 What's up?",
+            "reasoning_content": "The user said \"Hello world!\" This is a classic greeting, often the first program in programming tutorials. It's friendly and casual.",
             "refusal": null,
             "role": "assistant"
           }
         }
       ],
-      "created": 1762103800,
-      "id": "745b8f37-14a0-40e2-af1a-3c92d7939456_us-east-1",
-      "model": "grok-3",
+      "created": 1780102962,
+      "id": "6039f10d-4bcf-9fcf-b9b4-5aa7884d8986",
+      "model": "grok-4.3",
       "object": "chat.completion",
-      "system_fingerprint": "fp_301fb74d4b",
+      "system_fingerprint": "fp_eb3c003fc66c14ed",
       "usage": {
-        "completion_tokens": 25,
+        "completion_tokens": 9,
         "completion_tokens_details": {
           "accepted_prediction_tokens": 0,
           "audio_tokens": 0,
-          "reasoning_tokens": 0,
+          "reasoning_tokens": 138,
           "rejected_prediction_tokens": 0
         },
+        "cost_in_usd_ticks": 3993500,
         "num_sources_used": 0,
-        "prompt_tokens": 9,
+        "prompt_tokens": 133,
         "prompt_tokens_details": {
           "audio_tokens": 0,
-          "cached_tokens": 3,
+          "cached_tokens": 128,
           "image_tokens": 0,
-          "text_tokens": 9
+          "text_tokens": 133
         },
-        "total_tokens": 34
+        "total_tokens": 280
       }
     },
     "headers": {
@@ -79,7 +86,7 @@
         "DYNAMIC"
       ],
       "cf-ray": [
-        "998547f188cfdc06-ORD"
+        "a039d0979bb8feda-ORD"
       ],
       "connection": [
         "keep-alive"
@@ -88,16 +95,17 @@
         "application/json"
       ],
       "date": [
-        "Sun, 02 Nov 2025 17:16:41 GMT"
+        "Sat, 30 May 2026 01:02:44 GMT"
       ],
       "server": [
         "cloudflare"
       ],
-      "set-cookie": [
-        "__cf_bm=nfa2JRA46NY_W4xO1inZNObKF1qtJmEReNLj5nKqv4A-1762103801-1.0.1.1-_LjDs.Od9iXN0qD_Zwrxm2uGusLmrOYLcBPRbDiiH47xsIXWMFcI23FxID_XEaIYMCkqyQ1N2tP6XWTgyQ5iwgARQJM3U.Ye8Xa9GMFymfg; path=/; expires=Sun, 02-Nov-25 17:46:41 GMT; domain=.x.ai; HttpOnly; Secure; SameSite=None"
-      ],
+      "set-cookie": "[REDACTED:set-cookie]",
       "strict-transport-security": [
         "max-age=31536000"
+      ],
+      "traceparent": [
+        "00-4cc6f9817d0c100a5b6d1f155656299f-9de1265900000e5e-01"
       ],
       "transfer-encoding": [
         "chunked"
@@ -105,13 +113,35 @@
       "vary": [
         "origin, access-control-request-method, access-control-request-headers"
       ],
+      "x-metrics-e2e-ms": [
+        "2292.0"
+      ],
+      "x-metrics-mean-itl-ms": [
+        "13.1"
+      ],
+      "x-metrics-ttft-ms": [
+        "171.4"
+      ],
+      "x-ratelimit-limit-requests": [
+        "1800"
+      ],
+      "x-ratelimit-limit-tokens": [
+        "10000000"
+      ],
+      "x-ratelimit-remaining-requests": [
+        "1800"
+      ],
+      "x-ratelimit-remaining-tokens": [
+        "10000000"
+      ],
       "x-request-id": [
-        "00-142c889340dc7d5ead03963fc8e27e81-c5e4cf4b006ed32e-01"
+        "6039f10d-4bcf-9fcf-b9b4-5aa7884d8986"
       ],
       "x-zero-data-retention": [
         "false"
       ]
     },
     "status": 200
-  }
+  },
+  "streaming": false
 }

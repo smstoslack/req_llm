@@ -96,6 +96,17 @@ defmodule ReqLLM.Providers.OpenAITest do
       assert request.method == :post
     end
 
+    test "prepare_request routes gpt-4.1 models to Responses API" do
+      {:ok, model} = ReqLLM.model("openai:gpt-4.1-mini")
+      context = context_fixture()
+
+      {:ok, request} = OpenAI.prepare_request(:chat, model, context, [])
+
+      assert %Req.Request{} = request
+      assert request.url.path == "/responses"
+      assert request.method == :post
+    end
+
     test "prepare_request routes codex models to Responses API" do
       {:ok, model} = ReqLLM.model("openai:gpt-5.3-codex")
       context = context_fixture()
@@ -107,8 +118,52 @@ defmodule ReqLLM.Providers.OpenAITest do
       assert request.method == :post
     end
 
+    test "prepare_request uses json transcription format for gpt-4o transcribe variants" do
+      model_ids = [
+        "gpt-4o-transcribe",
+        "gpt-4o-transcribe-diarize",
+        "gpt-4o-mini-transcribe",
+        "gpt-4o-mini-transcribe-2025-03-20",
+        "gpt-4o-mini-transcribe-2025-12-15"
+      ]
+
+      for model_id <- model_ids do
+        {:ok, model} = ReqLLM.model("openai:#{model_id}")
+        {:ok, request} = OpenAI.prepare_request(:transcription, model, "audio", [])
+
+        assert Keyword.get(request.options[:form_multipart], :response_format) == "json"
+      end
+    end
+
+    test "prepare_request preserves verbose transcription format for whisper" do
+      {:ok, model} = ReqLLM.model("openai:whisper-1")
+
+      {:ok, request} = OpenAI.prepare_request(:transcription, model, "audio", [])
+
+      assert Keyword.get(request.options[:form_multipart], :response_format) == "verbose_json"
+    end
+
+    test "prepare_request defaults audio output fields for gpt-audio chat models" do
+      {:ok, model} = ReqLLM.model("openai:gpt-audio-mini")
+
+      {:ok, request} =
+        OpenAI.prepare_request(:chat, model, "Reply with exactly: pong", api_key: "test-key")
+
+      encoded_request = ReqLLM.Providers.OpenAI.ChatAPI.encode_body(request)
+      body = ReqLLM.Test.Helpers.json_body(encoded_request)
+
+      assert body["modalities"] == ["text", "audio"]
+      assert body["audio"] == %{"format" => "mp3", "voice" => "alloy"}
+    end
+
     test "attach_stream defaults chat max_tokens from model output limit" do
-      {:ok, model} = ReqLLM.model("openai:gpt-4")
+      model = %LLMDB.Model{
+        provider: :openai,
+        id: "chat-test-model",
+        limits: %{output: 4096},
+        extra: %{wire: %{protocol: "openai_chat"}}
+      }
+
       context = context_fixture()
 
       {:ok, request} = OpenAI.attach_stream(model, context, [api_key: "test-key"], nil)
@@ -118,7 +173,13 @@ defmodule ReqLLM.Providers.OpenAITest do
     end
 
     test "attach_stream preserves explicit chat max_tokens" do
-      {:ok, model} = ReqLLM.model("openai:gpt-4")
+      model = %LLMDB.Model{
+        provider: :openai,
+        id: "chat-test-model",
+        limits: %{output: 4096},
+        extra: %{wire: %{protocol: "openai_chat"}}
+      }
+
       context = context_fixture()
 
       {:ok, request} =
@@ -163,6 +224,17 @@ defmodule ReqLLM.Providers.OpenAITest do
 
       body = ReqLLM.Test.Helpers.json_body(request)
       assert body["max_output_tokens"] == 789
+    end
+
+    test "attach_stream accepts translated reasoning effort strings" do
+      {:ok, model} = ReqLLM.model("openai:gpt-5-nano")
+      context = context_fixture()
+
+      {:ok, request} =
+        OpenAI.attach_stream(model, context, [api_key: "test-key", reasoning_effort: "low"], nil)
+
+      body = ReqLLM.Test.Helpers.json_body(request)
+      assert body["reasoning"] == %{"effort" => "low"}
     end
 
     test "prepare_request for :object defaults token limit from model output limit" do
@@ -1000,6 +1072,30 @@ defmodule ReqLLM.Providers.OpenAITest do
       assert warnings == []
     end
 
+    test "translate_options for chat-latest renames max_tokens" do
+      {:ok, model} = ReqLLM.model("openai:chat-latest")
+
+      opts = [max_tokens: 1000, temperature: 0.7]
+      {translated_opts, warnings} = OpenAI.translate_options(:chat, model, opts)
+
+      assert translated_opts[:max_completion_tokens] == 1000
+      refute Keyword.has_key?(translated_opts, :temperature)
+      refute Keyword.has_key?(translated_opts, :max_tokens)
+      assert length(warnings) == 2
+      assert Enum.any?(warnings, &(&1 =~ "max_tokens"))
+      assert Enum.any?(warnings, &(&1 =~ "temperature=1"))
+    end
+
+    test "translate_options defaults audio output for gpt-audio chat models" do
+      {:ok, model} = ReqLLM.model("openai:gpt-audio-mini")
+
+      {translated_opts, warnings} = OpenAI.translate_options(:chat, model, max_tokens: 1000)
+
+      assert translated_opts[:modalities] == ["text", "audio"]
+      assert translated_opts[:audio] == %{voice: "alloy", format: "mp3"}
+      assert warnings == []
+    end
+
     test "translate_options for gpt-5 models renames max_tokens and drops sampling params" do
       {:ok, model} = ReqLLM.model("openai:gpt-5")
       opts = [max_tokens: 1500, temperature: 0.7, top_p: 0.9]
@@ -1025,6 +1121,26 @@ defmodule ReqLLM.Providers.OpenAITest do
       assert length(warnings) == 2
       assert Enum.any?(warnings, &(&1 =~ "max_tokens"))
       assert Enum.any?(warnings, &(&1 =~ "sampling parameters"))
+    end
+
+    test "translate_options for gpt-5-pro forces high reasoning effort" do
+      {:ok, model} = ReqLLM.model("openai:gpt-5-pro")
+      opts = [max_tokens: 2500, reasoning_effort: :low]
+      {translated_opts, warnings} = OpenAI.translate_options(:chat, model, opts)
+
+      assert translated_opts[:max_completion_tokens] == 2500
+      assert translated_opts[:reasoning_effort] == "high"
+      refute Keyword.has_key?(translated_opts, :max_tokens)
+      assert Enum.any?(warnings, &(&1 =~ "GPT-5 Pro only supports"))
+    end
+
+    test "translate_options for gpt-5-pro defaults reasoning effort to high" do
+      {:ok, model} = ReqLLM.model("openai:gpt-5-pro")
+      opts = [max_tokens: 2500]
+      {translated_opts, warnings} = OpenAI.translate_options(:chat, model, opts)
+
+      assert translated_opts[:reasoning_effort] == "high"
+      assert Enum.any?(warnings, &(&1 =~ "Set :reasoning_effort to high"))
     end
 
     test "translate_options for o4 models renames max_tokens and drops temperature" do
@@ -1154,7 +1270,40 @@ defmodule ReqLLM.Providers.OpenAITest do
     end
   end
 
+  describe "OpenAI adapter classification" do
+    test "classifies gpt-4.1 as Responses without reasoning defaults" do
+      refute ReqLLM.Providers.OpenAI.AdapterHelpers.reasoning_model?("gpt-4.1-mini")
+      assert ReqLLM.Providers.OpenAI.AdapterHelpers.responses_model?("gpt-4.1-mini")
+    end
+  end
+
   describe "ResponsesAPI json_schema support" do
+    test "ResponsesAPI omits encrypted reasoning include for non-reasoning models" do
+      request = %Req.Request{
+        url: URI.parse("https://api.openai.com/v1/responses"),
+        method: :post,
+        options: [context: context_fixture(), model: "gpt-4.1-mini"]
+      }
+
+      encoded_request = ReqLLM.Providers.OpenAI.ResponsesAPI.encode_body(request)
+      body = ReqLLM.Test.Helpers.json_body(encoded_request)
+
+      refute Map.has_key?(body, "include")
+    end
+
+    test "ResponsesAPI includes encrypted reasoning content for reasoning models" do
+      request = %Req.Request{
+        url: URI.parse("https://api.openai.com/v1/responses"),
+        method: :post,
+        options: [context: context_fixture(), model: "gpt-5-nano"]
+      }
+
+      encoded_request = ReqLLM.Providers.OpenAI.ResponsesAPI.encode_body(request)
+      body = ReqLLM.Test.Helpers.json_body(encoded_request)
+
+      assert body["include"] == ["reasoning.encrypted_content"]
+    end
+
     test "ResponsesAPI encode_text_format transforms response_format to flattened text.format" do
       schema = [
         name: [type: :string, required: true],
@@ -1540,6 +1689,38 @@ defmodule ReqLLM.Providers.OpenAITest do
 
       assert %ReqLLM.Response{} = resp.body
       refute Map.has_key?(resp.body.provider_meta, :logprobs)
+    end
+
+    test "decode_response extracts audio transcript as response text" do
+      mock_response_body = %{
+        "id" => "chatcmpl-audio",
+        "object" => "chat.completion",
+        "created" => 1_677_652_288,
+        "model" => "gpt-audio-mini",
+        "choices" => [
+          %{
+            "index" => 0,
+            "message" => %{
+              "role" => "assistant",
+              "content" => nil,
+              "audio" => %{"id" => "audio-1", "data" => "abc", "transcript" => "pong"}
+            },
+            "finish_reason" => "stop"
+          }
+        ],
+        "usage" => %{"prompt_tokens" => 10, "completion_tokens" => 2, "total_tokens" => 12}
+      }
+
+      mock_resp = %Req.Response{status: 200, body: mock_response_body}
+
+      {:ok, model} = ReqLLM.model("openai:gpt-audio-mini")
+      context = context_fixture()
+      mock_req = %Req.Request{options: [context: context, stream: false, model: model.id]}
+
+      {_req, resp} = OpenAI.decode_response({mock_req, mock_resp})
+
+      assert %ReqLLM.Response{} = resp.body
+      assert ReqLLM.Response.text(resp.body) == "pong"
     end
 
     test "openai_logprobs schema option is valid" do

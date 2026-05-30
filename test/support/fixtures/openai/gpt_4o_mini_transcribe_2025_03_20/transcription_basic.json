@@ -1,0 +1,110 @@
+{
+  "model_spec": "openai:gpt-4o-mini-transcribe-2025-03-20",
+  "provider": "openai",
+  "request": {
+    "body": {
+      "b64": "eyJfZml4dHVyZV9ib2R5Ijoibm9uX2pzb24iLCJieXRlX3NpemUiOjMxNzEyLCJjb250ZW50X3R5cGUiOiJtdWx0aXBhcnQvZm9ybS1kYXRhOyBib3VuZGFyeT1kZmE0ZDdmY2ZjNWYyNmY3MmZjMDYzZTIwMTg1YzFiOSJ9"
+    },
+    "canonical_json": {
+      "_fixture_body": "non_json",
+      "byte_size": 31712,
+      "content_type": "multipart/form-data; boundary=dfa4d7fcfc5f26f72fc063e20185c1b9"
+    },
+    "headers": {
+      "accept-encoding": [
+        "gzip"
+      ],
+      "authorization": "[REDACTED:authorization]",
+      "content-length": [
+        "31712"
+      ],
+      "content-type": [
+        "multipart/form-data; boundary=dfa4d7fcfc5f26f72fc063e20185c1b9"
+      ],
+      "user-agent": [
+        "req/0.5.18"
+      ]
+    },
+    "method": "post",
+    "url": "https://api.openai.com/v1/audio/transcriptions"
+  },
+  "response": {
+    "body": {
+      "text": "Hello World!",
+      "usage": {
+        "input_token_details": {
+          "audio_tokens": 8,
+          "text_tokens": 1
+        },
+        "input_tokens": 9,
+        "output_tokens": 5,
+        "total_tokens": 14,
+        "type": "tokens"
+      }
+    },
+    "headers": {
+      "access-control-expose-headers": [
+        "X-Request-ID",
+        "CF-Ray"
+      ],
+      "alt-svc": [
+        "h3=\":443\"; ma=86400"
+      ],
+      "cf-cache-status": [
+        "DYNAMIC"
+      ],
+      "cf-ray": [
+        "a0388f474e0da468-ORD"
+      ],
+      "connection": [
+        "keep-alive"
+      ],
+      "content-type": [
+        "application/json"
+      ],
+      "date": [
+        "Fri, 29 May 2026 21:23:21 GMT"
+      ],
+      "openai-organization": "[REDACTED:openai-organization]",
+      "openai-processing-ms": [
+        "358"
+      ],
+      "openai-project": [
+        "proj_j5AhgU4eLMRmsoO9FDg7BRD3"
+      ],
+      "openai-version": [
+        "2020-10-01"
+      ],
+      "server": [
+        "cloudflare"
+      ],
+      "set-cookie": "[REDACTED:set-cookie]",
+      "strict-transport-security": [
+        "max-age=31536000; includeSubDomains; preload"
+      ],
+      "transfer-encoding": [
+        "chunked"
+      ],
+      "x-content-type-options": [
+        "nosniff"
+      ],
+      "x-openai-proxy-wasm": [
+        "v0.1"
+      ],
+      "x-ratelimit-limit-requests": [
+        "10000"
+      ],
+      "x-ratelimit-remaining-requests": [
+        "9999"
+      ],
+      "x-ratelimit-reset-requests": [
+        "6ms"
+      ],
+      "x-request-id": [
+        "req_6221fc125b574b08bd909e412c7dcb26"
+      ]
+    },
+    "status": 200
+  },
+  "streaming": false
+}

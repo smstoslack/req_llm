@@ -1,9 +1,14 @@
 {
+  "model_spec": "openai:gpt-5-pro",
+  "provider": "openai",
   "request": {
     "body": {
-      "b64": "eyJpbnB1dCI6W3siY29udGVudCI6W3sidGV4dCI6IkhlbGxvIHdvcmxkISIsInR5cGUiOiJpbnB1dF90ZXh0In1dLCJyb2xlIjoidXNlciJ9XSwibWF4X291dHB1dF90b2tlbnMiOjIwMDAsIm1vZGVsIjoiZ3B0LTUtcHJvIiwic3RyZWFtIjpmYWxzZX0="
+      "b64": "eyJpbmNsdWRlIjpbInJlYXNvbmluZy5lbmNyeXB0ZWRfY29udGVudCJdLCJpbnB1dCI6W3siY29udGVudCI6W3sidGV4dCI6IkhlbGxvIHdvcmxkISIsInR5cGUiOiJpbnB1dF90ZXh0In1dLCJyb2xlIjoidXNlciJ9XSwibWF4X291dHB1dF90b2tlbnMiOjIwMDAsIm1vZGVsIjoiZ3B0LTUtcHJvIiwicmVhc29uaW5nIjp7ImVmZm9ydCI6ImhpZ2gifSwic3RyZWFtIjpmYWxzZX0="
     },
     "canonical_json": {
+      "include": [
+        "reasoning.encrypted_content"
+      ],
       "input": [
         {
           "content": [
@@ -17,6 +22,9 @@
       ],
       "max_output_tokens": 2000,
       "model": "gpt-5-pro",
+      "reasoning": {
+        "effort": "high"
+      },
       "stream": false
     },
     "headers": {
@@ -28,7 +36,7 @@
         "application/json"
       ],
       "user-agent": [
-        "req/0.5.15"
+        "req/0.5.18"
       ]
     },
     "method": "post",
@@ -37,22 +45,44 @@
   "response": {
     "body": {
       "background": false,
-      "billing": {
-        "payer": "developer"
+      "text": {
+        "format": {
+          "type": "text"
+        },
+        "verbosity": "medium"
       },
-      "created_at": 1762106498,
-      "error": null,
-      "id": "resp_0e5c99ad5424c1a90069079c82d8208193abb03662cb0c102e",
-      "incomplete_details": null,
-      "instructions": null,
+      "moderation": null,
+      "top_logprobs": 0,
+      "previous_response_id": null,
+      "tool_choice": "auto",
+      "service_tier": "default",
+      "status": "completed",
+      "tools": [],
+      "id": "resp_052b4b30d9e4461e006a19e1eafa0081a2b0868a91884cd5db",
+      "temperature": 1.0,
       "max_output_tokens": 2000,
-      "max_tool_calls": null,
-      "metadata": {},
+      "user": null,
+      "frequency_penalty": 0.0,
+      "error": null,
       "model": "gpt-5-pro-2025-10-06",
+      "usage": {
+        "input_tokens": 9,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 155,
+        "output_tokens_details": {
+          "reasoning_tokens": 128
+        },
+        "total_tokens": 164
+      },
+      "safety_identifier": null,
       "object": "response",
+      "parallel_tool_calls": true,
       "output": [
         {
-          "id": "rs_0e5c99ad5424c1a90069079c98417081938834ddbe976d0888",
+          "encrypted_content": "gAAAAABqGeH5rnf4f1Mc-Gt_ufyEDwgNQ0kIVrcwZFDZ6iaIADTfTtbUtwzIGVvzT-2x8v1x67INxeJkurNBlzxJzZXStRK5kASbCf0rH2n9R7a8YN6X3i-Dm9zF92c2m2Rw-tmBoa4l932wEEfcBXOUINh9SxeaSRfRZIi7_FX9QlIZY4CzdIZjBseh1iNd7HhdzCNK0EIo9MN3NXLTer21Me6BnMQN_CJO9HkSummyGP6P86Yi_oKdlHDZZ_AswvDE3HvasSriVNgHhunUfeQwbkmq1NZFUx40Q1-LozITJi8w75qbE2sNy1ClyE7VIdUFl_4j9FWPsc4Y_QJsGQY43mU6US9NpIXLGudVoCLUBWQVjbf5YmmV0I82XZCPxLV0CSjJbMCMkOWhDVduMqpFeZJ9aZSZKmZH7fwyV-3okQuCCQr7lYbDebLoBEWZWnlSDBEEd0U9VD3q_DdGevJdwJwlYer-XeZZNz8hzvYpUBJAhpuAbRIcIflfm2ROzwv_qDpSCcxj5SsobexVzx1w3lTZ-L9C9tp6PxanhDqm70x3tokw5qVn6ULSBL2iUdIOhbDFeaRLuS6CnFGQYsXZER8KyizF5HkUrSvn0HGDoB3pywY0U2BYpsL5ABYpIZ10usBOVGq9i99sY7_FZI1pzFUWOG-SONgLyawlUB_3rwYCgmW8Rt0kHMIf1FPq6XCQSPvhJKixS20RlWwoDTrreyrYLALCp-QRQ3w6H2KjOcPIMLaHbI_OLN2uWm-xANNp3qm7qXw04Gd8YQMdBXA8f69rOgPPbA9vSLhXM5RNYZN7YXEubcgQlOOAcpG1YEU4nPXcZgbwOnxkWG2LtRTsIU4moMkx30FUxLVKRJVzualnsa3ak2M5USm3lA3Iuny5KDdbi0T8YW0gdoKVQ6sdUhJFOd7BRCCwgKUS7wbBag5wQ2No0H_4uE_W-Fy-qRl4aTzxqmNo_x2XOf2VzwulWpCSRVBUug0ZGWtRzwlfJdrSGVFyM_fF9anl675WL2GDEpAR5z_s91CXw3IAcgnlYM2vQlLgFkWl9KgCqRkbiwXzM9K1tkxPSNVC5Qp4KE6YezF_ifwXWDUUalhJ4zWpEzrx0S1itJYKs21oCLUh3b4H8Exlaww-AGZ5KGP3OOmecQI1iGD6IrKCR2qlXCneKD-bQhgDfjIgZNE_Q-oU97rOvocdv6SMD34mbbgk2AXZ09ORlWcpuIqcI2_Te45cDwYTdmP7yU4Fc405ciQDXe0G7zXEDuTSdz-sDOz7N-sA7ylHbVqRzK8KL9lDCg_3sGhZE6o8gsfi7hyr7t2jUtuaW0KONlHtFktrAgUF0gGoZfxglN8sv8c0AAfADfKhAaZwxjY4T9cw3LvC2nI1rIMNx9d_9E2bl-AwBtH-7h4GJcI6R2QooquMmMME2-thoqHGhnkqwCXp_DuC9SdZbjSJEACLyH8JTn0G8xU5nSfFRfWXHpQyBETiKxTRsV15HP8zO2i13BOpUEGpsimgkj-Od0UcNKJN36ykj1gyqu6uWHBGG5ncEnoHnwRJtC1Boq75zBPD-oej3nFpP8IV2E8qmnm02C2vTFh9zL-3aGNaBjNX6Rueh406Q3Vcvf5bl_PdqCIR_0TtFs1Fo8azQiGW-39SkixdM0oX0ysuBAziOMZ-9a3ig-aNuM9oqLKRDVl4kzbncz2Jgq8RbNymKWho7Pb7HyVPNai7tUI_JiKfZyYiKXsxdUzfPTSgPz4NtqoHpuy-MQckS7DZSJQdKUYajjaaZbTxoElVpSBq_qDA1l_CFTLEE9CFcEENywA7TH1FZ4xZbQ==",
+          "id": "rs_052b4b30d9e4461e006a19e1f882e081a2907fa4a143234ef8",
           "summary": [],
           "type": "reasoning"
         },
@@ -65,50 +95,39 @@
               "type": "output_text"
             }
           ],
-          "id": "msg_0e5c99ad5424c1a90069079c9842d481938f4a68ce21c5131a",
+          "id": "msg_052b4b30d9e4461e006a19e1f8849881a2a55b6da3419ea573",
           "role": "assistant",
           "status": "completed",
           "type": "message"
         }
       ],
-      "parallel_tool_calls": true,
-      "previous_response_id": null,
-      "prompt_cache_key": null,
-      "prompt_cache_retention": null,
+      "instructions": null,
+      "store": true,
+      "presence_penalty": 0.0,
+      "incomplete_details": null,
       "reasoning": {
+        "context": "current_turn",
         "effort": "high",
         "summary": null
       },
-      "safety_identifier": null,
-      "service_tier": "default",
-      "status": "completed",
-      "store": true,
-      "temperature": 1.0,
-      "text": {
-        "format": {
-          "type": "text"
-        },
-        "verbosity": "medium"
-      },
-      "tool_choice": "auto",
-      "tools": [],
-      "top_logprobs": 0,
-      "top_p": 1.0,
+      "completed_at": 1780081144,
       "truncation": "disabled",
-      "usage": {
-        "input_tokens": 9,
-        "input_tokens_details": {
-          "cached_tokens": 0
-        },
-        "output_tokens": 79,
-        "output_tokens_details": {
-          "reasoning_tokens": 64
-        },
-        "total_tokens": 88
+      "top_p": 1.0,
+      "billing": {
+        "payer": "developer"
       },
-      "user": null
+      "prompt_cache_retention": "in_memory",
+      "metadata": {},
+      "prompt_cache_key": null,
+      "created_at": 1780081131,
+      "max_tool_calls": null
     },
     "headers": {
+      "access-control-expose-headers": [
+        "X-Request-ID",
+        "CF-Ray",
+        "CF-Ray"
+      ],
       "alt-svc": [
         "h3=\":443\"; ma=86400"
       ],
@@ -116,7 +135,7 @@
         "DYNAMIC"
       ],
       "cf-ray": [
-        "998589d16b35615e-ORD"
+        "a037bb9c2cc7a68b-ORD"
       ],
       "connection": [
         "keep-alive"
@@ -125,13 +144,11 @@
         "application/json"
       ],
       "date": [
-        "Sun, 02 Nov 2025 18:02:00 GMT"
+        "Fri, 29 May 2026 18:59:05 GMT"
       ],
-      "openai-organization": [
-        "epic-creative-sogybe"
-      ],
+      "openai-organization": "[REDACTED:openai-organization]",
       "openai-processing-ms": [
-        "21755"
+        "14056"
       ],
       "openai-project": [
         "proj_j5AhgU4eLMRmsoO9FDg7BRD3"
@@ -142,10 +159,7 @@
       "server": [
         "cloudflare"
       ],
-      "set-cookie": [
-        "__cf_bm=Q3.EmhmnSYu8WsqkKffa8F4pbkNqOuOPRIWAHn2QuQ8-1762106520-1.0.1.1-w6_lG3g4X.HoFcxBRyPDGc.q.L7OScR4wKwcltKBkOeXbDjx4YWEurKQvNSGYNKBTEYhBagg8tZ9X6Unio6vA0Iyc9SwcnRVeZeIOXzA2bw; path=/; expires=Sun, 02-Nov-25 18:32:00 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None",
-        "_cfuvid=93dilP.kK9V3Q_K_.9Q.TTJNkLnNcgxZxeO.Ua8pOpU-1762106520617-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None"
-      ],
+      "set-cookie": "[REDACTED:set-cookie]",
       "strict-transport-security": [
         "max-age=31536000; includeSubDomains; preload"
       ],
@@ -154,9 +168,6 @@
       ],
       "x-content-type-options": [
         "nosniff"
-      ],
-      "x-envoy-upstream-service-time": [
-        "21760"
       ],
       "x-ratelimit-limit-requests": [
         "10000"
@@ -177,9 +188,10 @@
         "0s"
       ],
       "x-request-id": [
-        "req_f8986cccbfb24055ab2ed9cf9242b586"
+        "req_1220d3945a60406c846c3b67bb18ed98"
       ]
     },
     "status": 200
-  }
+  },
+  "streaming": false
 }
